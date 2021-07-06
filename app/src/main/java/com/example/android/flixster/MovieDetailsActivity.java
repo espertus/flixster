@@ -7,31 +7,30 @@ import android.util.Log;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.example.android.flixster.databinding.ActivityMovieDetailsBinding;
 import com.example.android.flixster.models.Movie;
 
 import org.parceler.Parcels;
 
 public class MovieDetailsActivity extends AppCompatActivity {
 
+    ActivityMovieDetailsBinding binding;
     Movie movie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_details);
+        binding = ActivityMovieDetailsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         movie = Parcels.unwrap(getIntent().getParcelableExtra(Movie.class.getSimpleName()));
         displayMovie(movie);
     }
 
     private void displayMovie(Movie movie) {
-        TextView tvTitle = findViewById(R.id.tvTitle);
-        TextView tvOverview = findViewById(R.id.tvOverview);
-        RatingBar rbVoteAverage = findViewById(R.id.rbVoteAverage);
-
-        tvTitle.setText(movie.getTitle());
-        tvOverview.setText(movie.getOverview());
+        binding.tvTitle.setText(movie.getTitle());
+        binding.tvOverview.setText(movie.getOverview());
         float voteAverage = movie.getVoteAverage().floatValue();
-        rbVoteAverage.setRating(voteAverage > 0 ? voteAverage / 2.0f : voteAverage);
+        binding.rbVoteAverage.setRating(voteAverage > 0 ? voteAverage / 2.0f : voteAverage);
     }
 }
