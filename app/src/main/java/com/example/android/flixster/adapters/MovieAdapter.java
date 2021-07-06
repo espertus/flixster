@@ -1,5 +1,6 @@
 package com.example.android.flixster.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -9,15 +10,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.android.flixster.MovieDetailsActivity;
 import com.example.android.flixster.R;
+import com.example.android.flixster.databinding.ItemMovieBinding;
 import com.example.android.flixster.models.Movie;
 
-import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
 import java.util.List;
@@ -25,18 +25,19 @@ import java.util.List;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
-    Context context;
+    Activity activity;
     List<Movie> movies;
 
-    public MovieAdapter(Context context, List<Movie> movies) {
-        this.context = context;
+    public MovieAdapter(Activity activity, List<Movie> movies) {
+        this.activity = activity;
         this.movies = movies;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View movieView = LayoutInflater.from(context).inflate(R.layout.item_movie, parent, false);
-        return new ViewHolder(movieView);
+        ItemMovieBinding binding = ItemMovieBinding.inflate(activity.getLayoutInflater());
+        View movieView = binding.getRoot();
+        return new ViewHolder(movieView, binding);
     }
 
     @Override
@@ -59,11 +60,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         TextView tvOverview;
         ImageView ivPoster;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, ItemMovieBinding binding) {
             super(itemView);
-            tvTitle = itemView.findViewById(R.id.tvTitle);
-            tvOverview = itemView.findViewById(R.id.tvOverview);
-            ivPoster = itemView.findViewById(R.id.ivPoster);
+            tvTitle = binding.tvTitle;
+            tvOverview = binding.tvOverview;
+            ivPoster = binding.ivPoster;
             itemView.setOnClickListener(this);
         }
 
@@ -71,12 +72,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             tvTitle.setText(movie.getTitle());
             tvOverview.setText(movie.getOverview());
             String imageUrl;
-            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 imageUrl = movie.getBackdropPath();
             } else {
                 imageUrl = movie.getPosterPath();
             }
-            Glide.with(context)
+            Glide.with(activity)
                     .load(imageUrl)
                     .centerInside()
                     .transform(new RoundedCornersTransformation(POSTER_RADIUS, POSTER_MARGIN))
@@ -88,9 +89,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Movie movie = movies.get(position);
-                Intent intent =  new Intent(context, MovieDetailsActivity.class);
+                Intent intent =  new Intent(activity, MovieDetailsActivity.class);
                 intent.putExtra(Movie.class.getSimpleName(), Parcels.wrap(movie));
-                context.startActivity(intent);
+                activity.startActivity(intent);
             }
         }
     }
